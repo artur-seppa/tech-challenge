@@ -13,6 +13,7 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev"
   },
@@ -21,6 +22,7 @@
     "@nestjs/config": "4.0.4",
     "@nestjs/core": "11.1.29",
     "@nestjs/microservices": "11.1.29",
+    "@prisma/client": "6.19.3",
     "@tech-challenge/contracts": "workspace:*",
     "kafkajs": "2.2.4",
     "reflect-metadata": "0.2.2",
