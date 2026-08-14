@@ -28,3 +28,6 @@ pnpm-debug.log*
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# ai working docs
+docs/superpowers/
