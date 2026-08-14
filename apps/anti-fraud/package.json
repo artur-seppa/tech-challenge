@@ -1,0 +1,45 @@
+{
+  "name": "@tech-challenge/anti-fraud",
+  "version": "0.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "nest build",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev"
+  },
+  "dependencies": {
+    "@nestjs/common": "11.1.29",
+    "@nestjs/config": "4.0.4",
+    "@nestjs/core": "11.1.29",
+    "@nestjs/microservices": "11.1.29",
+    "@tech-challenge/contracts": "workspace:*",
+    "kafkajs": "2.2.4",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "10.5.0",
+    "@nestjs/cli": "11.0.24",
+    "@nestjs/schematics": "11.1.0",
+    "@nestjs/testing": "11.1.29",
+    "@swc/core": "1.15.47",
+    "@tech-challenge/config": "workspace:*",
+    "@types/node": "22.20.1",
+    "eslint": "10.8.1",
+    "prettier": "3.9.6",
+    "prisma": "6.19.3",
+    "typescript": "6.0.3",
+    "unplugin-swc": "1.5.11",
+    "vitest": "4.1.10"
+  }
+}
