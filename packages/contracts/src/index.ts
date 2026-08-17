@@ -1,5 +1,6 @@
 export { TOPICS } from './topics';
 export type { Topic } from './topics';
+export { parseOrWarn } from './parse-or-warn';
 export { transactionCreatedEventSchema } from './events/transaction-created.event';
 export type { TransactionCreatedEvent } from './events/transaction-created.event';
 export { transactionStatusUpdatedEventSchema } from './events/transaction-status-updated.event';
