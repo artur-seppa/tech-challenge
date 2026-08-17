@@ -15,7 +15,11 @@
     "test": "vitest run",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev"
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "11.1.29",
@@ -23,6 +27,8 @@
     "@nestjs/core": "11.1.29",
     "@nestjs/microservices": "11.1.29",
     "@nestjs/platform-express": "11.1.29",
+    "@nestjs/schedule": "6.1.3",
+    "@nestjs/swagger": "11.4.6",
     "@prisma/client": "6.19.3",
     "@tech-challenge/contracts": "workspace:*",
     "kafkajs": "2.2.4",
@@ -42,6 +48,7 @@
     "eslint": "10.8.1",
     "prettier": "3.9.6",
     "prisma": "6.19.3",
+    "tsx": "4.23.12",
     "typescript": "6.0.3",
     "unplugin-swc": "1.5.11",
     "vitest": "4.1.10"

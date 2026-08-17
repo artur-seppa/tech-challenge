@@ -6,3 +6,40 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum TransactionStatus {
+  pending
+  approved
+  rejected
+}
+
+model TransferType {
+  id           Int           @id @default(autoincrement())
+  name         String        @unique
+  transactions Transaction[]
+
+  @@map("transfer_types")
+}
+
+model Transaction {
+  id                      String            @id @default(uuid())
+  accountExternalIdDebit  String
+  accountExternalIdCredit String
+  transferTypeId          Int
+  transferType            TransferType      @relation(fields: [transferTypeId], references: [id])
+  value                   Decimal           @db.Decimal(18, 2)
+  status                  TransactionStatus @default(pending)
+  // Opcional: só setada quando o cliente manda o header Idempotency-Key (ver
+  // CreateTransactionUseCase / DECISIONS.md "Idempotência na criação de transação"). Nula pra
+  // requests sem o header — Postgres permite múltiplos NULL sob um índice unique, então não
+  // colide entre si.
+  idempotencyKey          String?           @unique
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+
+  @@index([status])
+  @@index([transferTypeId])
+  @@index([createdAt])
+  @@index([status, updatedAt])
+  @@map("transactions")
+}

@@ -1,25 +1,27 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { EvaluateTransactionUseCase } from './evaluate-transaction.use-case';
+import { DomainEventSerializer } from './shared/messaging/domain-event-serializer';
+import { getKafkaClientOptions } from './shared/messaging/kafka-config';
 import { KafkaPublisherService } from './shared/messaging/kafka-publisher.service';
+import { TransactionCreatedConsumer } from './transaction-created.consumer';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '../../.env' }),
     ClientsModule.register([
       {
         name: 'KAFKA_PRODUCER',
         transport: Transport.KAFKA,
         options: {
-          client: {
-            clientId: process.env.KAFKA_CLIENT_ID ?? 'tech-challenge',
-            brokers: (process.env.KAFKA_BROKERS ?? 'localhost:9092').split(','),
-          },
+          client: getKafkaClientOptions(),
+          serializer: new DomainEventSerializer(),
         },
       },
     ]),
   ],
-  providers: [KafkaPublisherService],
-  exports: [KafkaPublisherService],
+  controllers: [TransactionCreatedConsumer],
+  providers: [KafkaPublisherService, EvaluateTransactionUseCase],
 })
 export class AppModule {}

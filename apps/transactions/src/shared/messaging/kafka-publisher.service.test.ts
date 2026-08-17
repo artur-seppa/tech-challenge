@@ -1,32 +1,114 @@
+import { Logger } from '@nestjs/common';
 import type { ClientKafka } from '@nestjs/microservices';
-import { describe, expect, it, vi } from 'vitest';
+import { of, throwError } from 'rxjs';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { KafkaPublisherService } from './kafka-publisher.service';
 
 function makeClientKafkaMock(): ClientKafka {
   return {
     connect: vi.fn().mockResolvedValue(undefined),
-    emit: vi.fn(),
+    emit: vi.fn().mockReturnValue(of(undefined)),
   } as unknown as ClientKafka;
 }
 
 describe('KafkaPublisherService', () => {
-  it('connects to the client on module init', async () => {
+  it('connects to the client on module init', () => {
     const client = makeClientKafkaMock();
     const service = new KafkaPublisherService(client);
 
-    await service.onModuleInit();
+    service.onModuleInit();
 
     expect(client.connect).toHaveBeenCalledOnce();
   });
 
-  it('emits the payload on the given topic', () => {
-    const client = makeClientKafkaMock();
+  it('does not wait for the connection before returning, so an unreachable broker cannot block app bootstrap', () => {
+    const client = {
+      connect: vi.fn(() => new Promise<void>(() => {})),
+      emit: vi.fn(),
+    } as unknown as ClientKafka;
     const service = new KafkaPublisherService(client);
 
-    service.publish('transaction.created', { transactionExternalId: 'id-1' });
+    const result = service.onModuleInit();
 
-    expect(client.emit).toHaveBeenCalledWith('transaction.created', {
-      transactionExternalId: 'id-1',
+    expect(result).toBeUndefined();
+  });
+
+  it('logs, instead of throwing, when the connection fails', async () => {
+    const client = {
+      connect: vi.fn().mockRejectedValue(new Error('broker unreachable')),
+      emit: vi.fn(),
+    } as unknown as ClientKafka;
+    const errorSpy = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+    const service = new KafkaPublisherService(client);
+
+    service.onModuleInit();
+
+    await vi.waitFor(() => expect(errorSpy).toHaveBeenCalled());
+    expect(errorSpy.mock.calls[0]?.[0]).toContain('broker unreachable');
+  });
+
+  it('passes the raw payload straight through to emit()', () => {
+    // Envelope-wrapping is DomainEventSerializer's job now (see domain-event-serializer.test.ts),
+    // registered as this client's `serializer`. publish() just passes the payload through.
+    const client = makeClientKafkaMock();
+    const service = new KafkaPublisherService(client);
+    const payload = { transactionExternalId: 'id-1', value: 120.5 };
+
+    service.publish('transaction.created', payload);
+
+    expect(client.emit).toHaveBeenCalledWith('transaction.created', payload);
+  });
+
+  describe('retry on failure', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      vi.restoreAllMocks();
+    });
+
+    it('retries a failed publish with exponential backoff, then logs an error once retries are exhausted', async () => {
+      const client = {
+        connect: vi.fn().mockResolvedValue(undefined),
+        emit: vi.fn().mockReturnValue(throwError(() => new Error('broker unreachable'))),
+      } as unknown as ClientKafka;
+      const errorSpy = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+      const service = new KafkaPublisherService(client);
+
+      service.publish('transaction.created', { transactionExternalId: 'id-1' });
+
+      // 1 initial attempt + 3 retries at 500ms, 1000ms, 2000ms backoff.
+      await vi.advanceTimersByTimeAsync(0);
+      await vi.advanceTimersByTimeAsync(500);
+      await vi.advanceTimersByTimeAsync(1000);
+      await vi.advanceTimersByTimeAsync(2000);
+
+      expect(client.emit).toHaveBeenCalledTimes(4);
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('failed to publish to topic "transaction.created"'),
+      );
+    });
+
+    it('recovers after a transient failure without logging an error', async () => {
+      const client = {
+        connect: vi.fn().mockResolvedValue(undefined),
+        emit: vi
+          .fn()
+          .mockReturnValueOnce(throwError(() => new Error('broker unreachable')))
+          .mockReturnValue(of(undefined)),
+      } as unknown as ClientKafka;
+      const errorSpy = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+      const service = new KafkaPublisherService(client);
+
+      service.publish('transaction.created', { transactionExternalId: 'id-1' });
+
+      await vi.advanceTimersByTimeAsync(0);
+      await vi.advanceTimersByTimeAsync(500);
+
+      expect(client.emit).toHaveBeenCalledTimes(2);
+      expect(errorSpy).not.toHaveBeenCalled();
     });
   });
 });
