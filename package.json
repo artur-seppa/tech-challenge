@@ -13,7 +13,7 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
     "build": "pnpm -r --if-present build",
-    "quality": "pnpm build && pnpm lint && pnpm typecheck && pnpm format:check && pnpm test",
+    "quality": "pnpm build && pnpm lint && pnpm typecheck && pnpm format:check && pnpm test && pnpm --filter @tech-challenge/web test:e2e",
     "prepare": "husky"
   },
   "devDependencies": {
