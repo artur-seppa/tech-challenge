@@ -1,1 +1,34 @@
 @import 'tailwindcss';
+
+@theme {
+  --color-canvas: #f4f5f2;
+  --color-surface: #ffffff;
+  --color-ink: #16181d;
+  --color-ink-muted: #6b7078;
+  --color-rule: #d9dbd4;
+  --color-accent: #2a2e63;
+  --color-stamp-approved: #2f6b4f;
+  --color-stamp-pending: #8a5a16;
+  --color-stamp-rejected: #a23b2e;
+  --font-sans: var(--font-plex-sans), ui-sans-serif, sans-serif;
+  --font-display: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+@keyframes drawer-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.drawer-panel {
+  animation: drawer-slide-in 200ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer-panel {
+    animation: none;
+  }
+}
