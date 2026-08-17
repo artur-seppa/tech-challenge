@@ -1,29 +1,30 @@
 packages:
-  - "apps/*"
-  - "packages/*"
+  - 'apps/*'
+  - 'packages/*'
 allowBuilds:
-  "@prisma/client": true
-  "@prisma/engines": true
-  "@swc/core": true
+  '@prisma/client': true
+  '@prisma/engines': true
+  '@swc/core': true
+  esbuild: true
   prisma: true
 minimumReleaseAgeExclude:
-  - "@commitlint/cli@21.2.2"
-  - "@commitlint/config-conventional@21.2.2"
-  - "@commitlint/format@21.2.2"
-  - "@commitlint/is-ignored@21.2.2"
-  - "@commitlint/lint@21.2.2"
-  - "@commitlint/load@21.2.2"
-  - "@commitlint/parse@21.2.2"
-  - "@commitlint/resolve-extends@21.2.2"
-  - "@commitlint/rules@21.2.2"
+  - '@commitlint/cli@21.2.2'
+  - '@commitlint/config-conventional@21.2.2'
+  - '@commitlint/format@21.2.2'
+  - '@commitlint/is-ignored@21.2.2'
+  - '@commitlint/lint@21.2.2'
+  - '@commitlint/load@21.2.2'
+  - '@commitlint/parse@21.2.2'
+  - '@commitlint/resolve-extends@21.2.2'
+  - '@commitlint/rules@21.2.2'
   - unplugin-swc@1.5.11
-  - "@next/env@16.3.1"
-  - "@next/swc-darwin-arm64@16.3.1"
-  - "@next/swc-darwin-x64@16.3.1"
-  - "@next/swc-linux-arm64-gnu@16.3.1"
-  - "@next/swc-linux-arm64-musl@16.3.1"
-  - "@next/swc-linux-x64-gnu@16.3.1"
-  - "@next/swc-linux-x64-musl@16.3.1"
-  - "@next/swc-win32-arm64-msvc@16.3.1"
-  - "@next/swc-win32-x64-msvc@16.3.1"
+  - '@next/env@16.3.1'
+  - '@next/swc-darwin-arm64@16.3.1'
+  - '@next/swc-darwin-x64@16.3.1'
+  - '@next/swc-linux-arm64-gnu@16.3.1'
+  - '@next/swc-linux-arm64-musl@16.3.1'
+  - '@next/swc-linux-x64-gnu@16.3.1'
+  - '@next/swc-linux-x64-musl@16.3.1'
+  - '@next/swc-win32-arm64-msvc@16.3.1'
+  - '@next/swc-win32-x64-msvc@16.3.1'
   - next@16.3.1
